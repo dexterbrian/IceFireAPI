@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class CommentController extends Controller
 {
     /**
-     * List comments for a specific book
+     * Fetch comments for a specific book from the comments table in the db
      *
      * @param String $bookId
      * @return JSON response
      */
     public function listComments($bookId) {
+
+        $comments = DB::select('select * from comments where bookId = ?', [$bookId]);
+
         return response()->json([
-            'message' => 'Comments for bookId: ' . $bookId
+            'comments' => $comments
         ]);
     }
 
@@ -25,21 +31,70 @@ class CommentController extends Controller
      * @return String response
      */
     public function addComment(Request $request) {
+
         if($request->filled('bookId') && $request->filled('comment')) {
-            // Get ip address of the commenter
-            // Add comment to db
+
+            // If the comments table exists then insert comment
+            if (Schema::hasTable('comments')) {
+                
+                $response = $this->insertComment(
+                    $request->input('bookId'),
+                    $request->ip(),
+                    $request->input('comment'),
+                    date(DATE_RFC850) // returns UTC date time
+                );
+
+            }
+            // If comments table doesn't exist then create it and then insert comment
+            else {
+
+                Schema::create('comments', function(Blueprint $table) {
+                    $table->id();
+                    $table->string('bookId', 7);
+                    $table->string('ipAddress', 45);
+                    $table->string('comment', 500);
+                    $table->string('date', 50);
+                });
+
+                $response = $this->insertComment(
+                    $request->input('bookId'),
+                    $request->ip(),
+                    $request->input('comment'),
+                    date(DATE_RFC850)
+                );
+
+            }
+
             return response()->json([
-                'message' =>'Comment added',
-                'bookId' => $request->input('bookId'),
-                'comment' => $request->input('comment')
+                'message' => $response ? 'Comment added' : 'Unable to add comment'
             ]);
         }
         else {
             return response()->json([
                 'error' => true,
-                'message' => 'Missing required parameters'
+                'message' => 'Missing required parameters: bookId & comment'
             ]);
         }
         
+    }
+
+    /**
+     * Inserts comment into the comment table
+     *
+     * @param string $bookId
+     * @param string $ip
+     * @param string $comment
+     * @param string $time
+     * @return bool
+     */
+    private function insertComment($bookId, $ip, $comment, $time) {
+        return DB::insert('insert into comments (bookId, ipAddress, comment, date) values (?, ?, ?, ?)', 
+            [
+                $bookId,
+                $ip,
+                $comment,
+                $time
+            ]
+        );
     }
 }
