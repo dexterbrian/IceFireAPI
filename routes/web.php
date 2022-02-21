@@ -16,3 +16,13 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+$router->get('/listBooks', 'BookController@listBooks');
+
+$router->post('/listAllCharacters', 'CharacterController@listAllCharacters');
+
+$router->get('/listComments/{bookId}', 'CommentController@listComments');
+
+$router->get('/sortCharacters', 'CharacterController@sortCharacters');
+
+$router->post('/addComment', 'CommentController@addComment');
