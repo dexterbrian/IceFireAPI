@@ -78,6 +78,7 @@ class CharacterController extends Controller
         // Enable sorting by name in alphabetical order (ascending or descending) and by age then returning
         // the sorted characters as JSON response
         $sortedCharacters = $this->sortCharacters($response, $request->input('sortType'), $request->input('sortOrder'), $request->input('filter'));
+        $totalAges = $this->addUpCharacterAges($sortedCharacters);
 
         return response()->json([
             'characters' => empty($sortedCharacters)
@@ -87,9 +88,9 @@ class CharacterController extends Controller
                 )
                 : $sortedCharacters,
             'characterCount' => count($sortedCharacters), // return characterCount, totalCharacterAge (object containing (age) inMonths and inYears)
-            'totalCharacterAge' => (object) [
-                'inMonths' => null,
-                'inYears' => null
+            'totalAge' => (object) [
+                'inMonths' => $totalAges->inMonths,
+                'inYears' => $totalAges->inYears
             ]
         ]);
     }
@@ -221,5 +222,26 @@ class CharacterController extends Controller
         }
 
         return $response;
+    }
+
+    /**
+     * Get the sum total of the ages of all the characters.
+     *
+     * @param array $characters
+     * @return object totalAgesObject containing age in months and in years
+     */
+    private function addUpCharacterAges($characters) {
+        $totalAges = 0;
+
+        foreach ($characters as $character) {
+            $totalAges = $totalAges + $character->age;
+        }
+
+        $totalAgesObject = (object) [
+            'inMonths' => $totalAges * 12,
+            'inYears' => $totalAges
+        ];
+
+        return $totalAgesObject;
     }
 }
