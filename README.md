@@ -1,6 +1,8 @@
 # IceFireAPI
 The API to serve the IceFire React app with the data on the books, authors and characters from the Ice And Fire universe and also store and fetch comments from an SQL database. This project was for a Backend Engineer Technical Assessment project using Lumen PHP Framework.
 
+You can access the API here: https://icefireapi.herokuapp.com/public
+
 # Lumen PHP Framework
 
 [![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
