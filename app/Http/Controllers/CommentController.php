@@ -13,14 +13,15 @@ class CommentController extends Controller
      * Fetch comments for a specific book from the comments table in the db
      *
      * @param String $bookId
-     * @return JSON response
+     * @return JSON comments
      */
     public function listComments($bookId) {
 
         $comments = DB::select('select * from comments where bookId = ?', [$bookId]);
 
         return response()->json([
-            'comments' => $comments
+            'comments' => $comments,
+            'commentCount' => count($comments)
         ]);
     }
 
@@ -28,7 +29,7 @@ class CommentController extends Controller
      * Add comment for a specific book
      * 
      * @param Request $request
-     * @return String response
+     * @return String message
      */
     public function addComment(Request $request) {
 
