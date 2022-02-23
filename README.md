@@ -5,7 +5,7 @@ You can access the deployed API here: https://icefireapi.herokuapp.com/public
 
 # Running IceFire in Development
 * Clone this project.
-* Download and install composer and PHP.
+* Download and install composer and PHP. You will also need a MySQL server to connect to.
 * Run `composer install` in your terminal to install required dependencies.
 * Run `php -S localhost:8000 -t public` to start the development server.
 * Open [http://localhost:8000](http://localhost:8000) to view it in your browser.
